@@ -1,4 +1,4 @@
-import { IMessage, IUser } from '../types';
+import { IMessage, IUser, IUserBase } from '../types';
 
 export const backendServerUrl: string =
   process.env.REACT_APP_BACKEND_SERVER_LOCATION || '';
@@ -19,12 +19,13 @@ export const getDefaultPostHeaders = (token: string) => {
 export const fetchUserInformation = async (
   accessToken: string,
   uid: string,
-  email: string
+  email: string,
+  picture: string
 ): Promise<IUser | null> => {
   const res = await fetch(`${backendServerUrl}/api/users/${uid}`, {
     method: 'POST',
     headers: getDefaultPostHeaders(accessToken),
-    body: JSON.stringify({ uid, email }),
+    body: JSON.stringify({ uid, email, picture }),
   });
 
   const user = await res.json();
@@ -58,4 +59,31 @@ export const postMessage = async (
 
   const message = await res.json();
   return message;
+};
+
+export const searchUsers = async (
+  accessToken: string,
+  query: string
+): Promise<IUserBase[]> => {
+  const res = await fetch(`${backendServerUrl}/api/users/search/${query}`, {
+    method: 'GET',
+    headers: getDefaultHeaders(accessToken),
+  });
+
+  const users = await res.json();
+  return users;
+};
+
+export const createChat = async (
+  accessToken: string,
+  oppositeUserId: string
+): Promise<string> => {
+  const res = await fetch(`${backendServerUrl}/api/chats`, {
+    method: 'POST',
+    headers: getDefaultPostHeaders(accessToken),
+    body: JSON.stringify({ uid: oppositeUserId }),
+  });
+
+  const chatId = await res.json();
+  return chatId;
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import {
   accessTokenAtom,
@@ -6,13 +6,25 @@ import {
   messagesAtom,
   selectedChatAtom,
   userAtom,
+  userPictureAtom,
 } from '../../state';
-import { Box, TextField, Typography, Button, IconButton } from '@mui/material';
-import { DRAWER_WIDTH, MainContent } from '../AppDrawer/AppDrawer';
+import {
+  Box,
+  TextField,
+  Typography,
+  IconButton,
+  Divider,
+  Avatar,
+} from '@mui/material';
+import { MainContent } from '../AppDrawer/AppDrawer';
 import Loader from '../Loader/Loader';
-import { fetchChatMessages, postMessage } from '../../utils/api';
+import { fetchChatMessages } from '../../utils/api';
 import ChatMessage from '../ChatMessage/ChatMessage';
 import SendIcon from '@mui/icons-material/Send';
+import { socket } from '../../utils/sockets';
+import { IBroadcastMessage } from '../../types';
+import { HorizontalRule } from '@mui/icons-material';
+const EmptyIllustration = require('../../assets/emptyillustration.svg');
 
 const ChatCanvas = () => {
   const [selectedChat, setSelectedChat] = useRecoilState(selectedChatAtom);
@@ -24,6 +36,7 @@ const ChatCanvas = () => {
   const [currentUser, setCurrentUser] = useRecoilState(userAtom);
   const [message, setMessage] = useState('');
   const chatCanvasRef = useRef<HTMLDivElement>(null);
+  const [userPicture, setUserPicture] = useRecoilState(userPictureAtom);
 
   useEffect(() => {
     if (selectedChat) {
@@ -46,26 +59,64 @@ const ChatCanvas = () => {
   };
 
   const sendMessage = async () => {
-    await postMessage(
-      accessToken as string,
-      selectedChat as string,
-      currentUser.uid,
-      message
-    );
+    const messageToBeBroadcasted: IBroadcastMessage = {
+      chatId: selectedChat as string,
+      senderId: currentUser?.uid as string,
+      text: message,
+      timestamp: new Date(),
+      participants:
+        currentUser?.chats.find((c) => c.uid === selectedChat)?.participants ||
+        [],
+    };
+    socket?.emit('msg', messageToBeBroadcasted);
+    setMessages([
+      ...(messages || []),
+      {
+        chatId: selectedChat as string,
+        text: message,
+        timestamp: new Date(),
+        sender: {
+          email: currentUser?.email || '',
+          uid: currentUser?.uid || '',
+          picture: currentUser?.picture || '',
+        },
+      },
+    ]);
     setMessage('');
   };
 
   const scrollToBottom = () => {
-    console.log('scrolling');
     chatCanvasRef.current?.scrollTo(0, chatCanvasRef.current?.scrollHeight);
   };
 
   if (!selectedChat)
     return (
       <MainContent open={isAppDrawerVisible}>
-        <Typography variant="body1" color="initial">
-          Select a chat to get started
-        </Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100%',
+          }}
+        >
+          <Typography
+            variant="h5"
+            color="initial"
+            sx={{
+              marginTop: '3rem',
+              textAlign: 'center',
+            }}
+          >
+            Select a chat to start messaging
+          </Typography>
+          <img
+            src={EmptyIllustration.default}
+            alt="Empty Chat"
+            height={window.innerWidth > 500 ? '70%' : '50%'}
+          />
+        </Box>
       </MainContent>
     );
   else {
@@ -84,6 +135,36 @@ const ChatCanvas = () => {
       >
         <Box
           sx={{
+            marginBottom: '0.5rem',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          <Avatar
+            src={
+              currentUser?.chats
+                .find((c) => c.uid === selectedChat)
+                ?.participants.find((p) => p.uid !== currentUser?.uid)
+                ?.picture as string
+            }
+            sx={{ width: 35, height: 35, marginRight: '0.5rem' }}
+          />
+          <Typography variant="h6" color="initial">
+            {currentUser?.chats.find((c) => c.uid === selectedChat)
+              ?.participants.length === 2 &&
+              currentUser?.chats
+                .find((c) => c.uid === selectedChat)
+                ?.participants.find((p) => p.uid !== currentUser?.uid)?.email}
+          </Typography>
+        </Box>
+        <Divider
+          sx={{
+            marginBottom: '0.5rem',
+          }}
+        />
+
+        <Box
+          sx={{
             flex: 1,
             overflowY: 'scroll',
           }}
@@ -96,7 +177,7 @@ const ChatCanvas = () => {
               message={message.text}
               timestamp={new Date(message.timestamp)}
               sender={message.sender.email}
-              isMessageSentByMe={message.sender.email === currentUser.email}
+              isMessageSentByMe={message.sender.email === currentUser?.email}
             />
           ))}
         </Box>
@@ -106,6 +187,7 @@ const ChatCanvas = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            marginTop: '1rem',
           }}
         >
           <TextField
@@ -116,6 +198,11 @@ const ChatCanvas = () => {
             fullWidth
             value={message}
             onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={(ev) => {
+              if (ev.key === 'Enter') {
+                sendMessage();
+              }
+            }}
           />
           <IconButton
             aria-label="Send"
@@ -124,6 +211,8 @@ const ChatCanvas = () => {
             }}
             size="large"
             onClick={() => sendMessage()}
+            disabled={message === ''}
+            color="primary"
           >
             <SendIcon />
           </IconButton>

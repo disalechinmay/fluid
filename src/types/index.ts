@@ -1,6 +1,7 @@
 export interface IUserBase {
   uid: string;
   email: string;
+  picture: string;
 }
 
 export interface IUser extends IUserBase {
@@ -17,4 +18,12 @@ export interface IMessage {
   sender: IUserBase;
   text: string;
   timestamp: Date;
+}
+
+export interface IBroadcastMessage {
+  chatId: string;
+  senderId: string;
+  text: string;
+  timestamp: Date;
+  participants: IUserBase[];
 }

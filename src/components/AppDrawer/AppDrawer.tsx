@@ -1,8 +1,11 @@
 import React from 'react';
 import Drawer from '@mui/material/Drawer';
 import {
+  Avatar,
   Box,
+  Button,
   Divider,
+  IconButton,
   List,
   ListItem,
   ListItemButton,
@@ -22,6 +25,8 @@ import {
   userAtom,
 } from '../../state';
 import UserIcon from '@mui/icons-material/AccountCircle';
+import AddIcon from '@mui/icons-material/Add';
+import NewChatDialog from '../NewChatDialog/NewChatDialog';
 
 export const DRAWER_WIDTH = '300px';
 
@@ -54,6 +59,7 @@ const AppDrawer = () => {
   const [chatsMetadata, setChatsMetadata] = useRecoilState(chatsMetadataAtom);
   const [currentUser, setCurrentUser] = useRecoilState(userAtom);
   const [selectedChat, setSelectedChat] = useRecoilState(selectedChatAtom);
+  const [newChatDialogOpen, setNewChatDialogOpen] = React.useState(false);
 
   return (
     <div>
@@ -71,11 +77,25 @@ const AppDrawer = () => {
       >
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
-          <List subheader={<ListSubheader>Personal Chats</ListSubheader>}>
+          <List
+            subheader={
+              <ListSubheader
+                sx={{
+                  display: 'flex',
+                  marginTop: '2rem',
+                }}
+              >
+                <Box sx={{ flex: 1 }}>Personal Chats</Box>
+                <IconButton onClick={() => setNewChatDialogOpen(true)}>
+                  <AddIcon />
+                </IconButton>
+              </ListSubheader>
+            }
+          >
             {chatsMetadata.map((chatMetadata) => {
               let oppositePartyName = '';
               chatMetadata.participants.forEach((participant) => {
-                if (participant.uid !== currentUser.uid) {
+                if (participant.uid !== currentUser?.uid) {
                   oppositePartyName = participant.email;
                 }
               });
@@ -86,9 +106,16 @@ const AppDrawer = () => {
                   disablePadding
                   onClick={() => setSelectedChat(chatMetadata.uid)}
                 >
-                  <ListItemButton>
+                  <ListItemButton selected={selectedChat === chatMetadata.uid}>
                     <ListItemIcon sx={{ minWidth: '30px' }}>
-                      <UserIcon />
+                      <Avatar
+                        src={
+                          chatMetadata.participants.find(
+                            (p) => p.uid !== currentUser?.uid
+                          )?.picture
+                        }
+                        sx={{ width: 24, height: 24 }}
+                      />
                     </ListItemIcon>
                     <ListItemText
                       primaryTypographyProps={{ whiteSpace: 'normal' }}
@@ -102,6 +129,11 @@ const AppDrawer = () => {
           <Divider />
         </Box>
       </Drawer>
+
+      <NewChatDialog
+        open={newChatDialogOpen}
+        setOpen={(v) => setNewChatDialogOpen(v)}
+      />
     </div>
   );
 };

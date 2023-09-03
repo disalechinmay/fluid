@@ -1,8 +1,15 @@
 import { atom } from 'recoil';
-import { IChat, IMessage } from '../types';
+import { IChat, IMessage, IUser } from '../types';
+import { Socket } from 'socket.io-client';
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 
-export const userAtom = atom<any | null>({
+export const userAtom = atom<IUser | null>({
   key: 'user',
+  default: null,
+});
+
+export const userPictureAtom = atom<string | null>({
+  key: 'userPicture',
   default: null,
 });
 
@@ -28,5 +35,10 @@ export const selectedChatAtom = atom<string | null>({
 
 export const messagesAtom = atom<IMessage[] | null>({
   key: 'messages',
+  default: null,
+});
+
+export const preloadChatAtom = atom<string | null>({
+  key: 'preloadChat',
   default: null,
 });
