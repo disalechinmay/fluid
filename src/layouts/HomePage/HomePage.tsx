@@ -68,12 +68,12 @@ const HomePage = () => {
     if (!accessToken) {
       let token = null;
       try {
-        token = (await getAccessTokenSilently({
+        token = await getAccessTokenSilently({
           authorizationParams: {
             audience: backendServerUrl,
             scope: 'read:profile',
           },
-        })) as string;
+        });
       } catch (ignored) {}
 
       if (token) setAccessToken(token);
@@ -111,7 +111,6 @@ const HomePage = () => {
 
   useEffect(() => {
     socket.on('brdcst-' + user?.uid, (data: IBroadcastMessage) => {
-      console.log('Selected cahat', selectedChat);
       if (data && data.chatId && selectedChat) {
         if (data.chatId === selectedChat) {
           setMessages((messages) => [

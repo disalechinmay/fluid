@@ -34,12 +34,16 @@ export const fetchUserInformation = async (
 
 export const fetchChatMessages = async (
   accessToken: string,
-  chatId: string
+  chatId: string,
+  last: string
 ): Promise<IMessage[]> => {
-  const res = await fetch(`${backendServerUrl}/api/messages/${chatId}`, {
-    method: 'GET',
-    headers: getDefaultHeaders(accessToken),
-  });
+  const res = await fetch(
+    `${backendServerUrl}/api/messages/${chatId}/${last}`,
+    {
+      method: 'GET',
+      headers: getDefaultHeaders(accessToken),
+    }
+  );
 
   const messages = await res.json();
   return messages;

@@ -15,6 +15,7 @@ import {
   IconButton,
   Divider,
   Avatar,
+  Button,
 } from '@mui/material';
 import { MainContent } from '../AppDrawer/AppDrawer';
 import Loader from '../Loader/Loader';
@@ -37,6 +38,9 @@ const ChatCanvas = () => {
   const [message, setMessage] = useState('');
   const chatCanvasRef = useRef<HTMLDivElement>(null);
   const [userPicture, setUserPicture] = useRecoilState(userPictureAtom);
+  const [loadingPreviousMessages, setLoadingPreviousMessages] = useState(false);
+  const [initialScrollToBottomDone, setInitialScrollToBottomDone] =
+    useState(false);
 
   useEffect(() => {
     if (selectedChat) {
@@ -45,15 +49,17 @@ const ChatCanvas = () => {
   }, [selectedChat]);
 
   useEffect(() => {
-    if (messages) {
+    if (!initialScrollToBottomDone && messages) {
       scrollToBottom();
+      setInitialScrollToBottomDone(true);
     }
   }, [messages]);
 
   const fetchMessages = async () => {
     const messages = await fetchChatMessages(
       accessToken as string,
-      selectedChat as string
+      selectedChat as string,
+      'latest'
     );
     setMessages(messages);
   };
@@ -87,6 +93,18 @@ const ChatCanvas = () => {
 
   const scrollToBottom = () => {
     chatCanvasRef.current?.scrollTo(0, chatCanvasRef.current?.scrollHeight);
+  };
+
+  const loadPreviousMessages = async () => {
+    if (!messages) return;
+    setLoadingPreviousMessages(true);
+    let oldMessages = await fetchChatMessages(
+      accessToken as string,
+      selectedChat as string,
+      messages[0].timestamp.toString()
+    );
+    setMessages([...(oldMessages || []), ...messages]);
+    setLoadingPreviousMessages(false);
   };
 
   if (!selectedChat)
@@ -162,6 +180,23 @@ const ChatCanvas = () => {
             marginBottom: '0.5rem',
           }}
         />
+
+        {messages.length && messages.length >= 5 && (
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              marginBottom: '0.5rem',
+            }}
+          >
+            <Button
+              onClick={() => loadPreviousMessages()}
+              disabled={loadingPreviousMessages}
+            >
+              Load Previous Messages
+            </Button>
+          </Box>
+        )}
 
         <Box
           sx={{

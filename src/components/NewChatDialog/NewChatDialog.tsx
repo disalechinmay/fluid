@@ -41,6 +41,7 @@ const NewChatDialog = ({ open, setOpen }: NewChatDialogProps) => {
   };
 
   const handleCreateChat = async () => {
+    if (!selectedUser) return;
     setFormDisabled(true);
     let chatId = await createChat(accessToken as string, selectedUser);
     window.location.href = '/?preload=' + chatId;
