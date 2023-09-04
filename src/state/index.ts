@@ -2,6 +2,7 @@ import { atom } from 'recoil';
 import { IChat, IMessage, IUser } from '../types';
 import { Socket } from 'socket.io-client';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
+import { User } from '@auth0/auth0-react';
 
 export const userAtom = atom<IUser | null>({
   key: 'user',
@@ -35,10 +36,5 @@ export const selectedChatAtom = atom<string | null>({
 
 export const messagesAtom = atom<IMessage[] | null>({
   key: 'messages',
-  default: null,
-});
-
-export const preloadChatAtom = atom<string | null>({
-  key: 'preloadChat',
   default: null,
 });

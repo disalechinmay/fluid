@@ -5,7 +5,6 @@ import {
   accessTokenAtom,
   chatsMetadataAtom,
   messagesAtom,
-  preloadChatAtom,
   selectedChatAtom,
   userAtom,
   userPictureAtom,
@@ -36,26 +35,25 @@ const HomePage = () => {
   const [selectedChat, setSelectedChat] = useRecoilState(selectedChatAtom);
   const [messages, setMessages] = useRecoilState(messagesAtom);
   const [userPicture, setUserPicture] = useRecoilState(userPictureAtom);
-  const [preloadChat, setPreloadChat] = useRecoilState(preloadChatAtom);
 
   // Local State
   const [isLoading, setIsLoading] = React.useState(true);
 
   // Effects
   useEffect(() => {
-    if (!isAuth0Loading && accessToken && isLoading) {
-      initializeHomePage();
-    }
+    if (!userFromAuth0) return;
+    if (!accessToken) return;
+    if (!isLoading) return;
 
-    if (accessToken) {
-      socket.auth = { token: accessToken };
-      socket.connect();
-    }
+    initializeHomePage();
+
+    socket.auth = { token: accessToken };
+    socket.connect();
 
     return () => {
       socket?.disconnect();
     };
-  }, [accessToken]);
+  }, [userFromAuth0, accessToken]);
 
   useEffect(() => {
     if (!isAuth0Loading) {
@@ -103,7 +101,6 @@ const HomePage = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const preloadChatId = urlParams.get('preload');
     if (preloadChatId) {
-      setPreloadChat(preloadChatId);
       setSelectedChat(preloadChatId);
     }
     setIsLoading(false);

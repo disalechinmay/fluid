@@ -20,11 +20,13 @@ import {
 import { MainContent } from '../AppDrawer/AppDrawer';
 import Loader from '../Loader/Loader';
 import { fetchChatMessages } from '../../utils/api';
-import ChatMessage from '../ChatMessage/ChatMessage';
+import ChatMessage, { REPLY_SEPARATOR } from '../ChatMessage/ChatMessage';
 import SendIcon from '@mui/icons-material/Send';
 import { socket } from '../../utils/sockets';
 import { IBroadcastMessage } from '../../types';
 import { HorizontalRule } from '@mui/icons-material';
+import CloseIcon from '@mui/icons-material/Close';
+
 const EmptyIllustration = require('../../assets/emptyillustration.svg');
 
 const ChatCanvas = () => {
@@ -39,8 +41,9 @@ const ChatCanvas = () => {
   const chatCanvasRef = useRef<HTMLDivElement>(null);
   const [userPicture, setUserPicture] = useRecoilState(userPictureAtom);
   const [loadingPreviousMessages, setLoadingPreviousMessages] = useState(false);
-  const [initialScrollToBottomDone, setInitialScrollToBottomDone] =
+  const [isFromLoadPreviousButton, setIsFromLoadPreviousButton] =
     useState(false);
+  const [replyingToMessage, setReplyingToMessage] = useState<string>('');
 
   useEffect(() => {
     if (selectedChat) {
@@ -49,10 +52,10 @@ const ChatCanvas = () => {
   }, [selectedChat]);
 
   useEffect(() => {
-    if (!initialScrollToBottomDone && messages) {
+    if (messages && !isFromLoadPreviousButton) {
       scrollToBottom();
-      setInitialScrollToBottomDone(true);
     }
+    setIsFromLoadPreviousButton(false);
   }, [messages]);
 
   const fetchMessages = async () => {
@@ -65,10 +68,16 @@ const ChatCanvas = () => {
   };
 
   const sendMessage = async () => {
+    let messageWithQuotes = message;
+    if (replyingToMessage !== '') {
+      messageWithQuotes = replyingToMessage + REPLY_SEPARATOR + message;
+      setReplyingToMessage('');
+    }
+
     const messageToBeBroadcasted: IBroadcastMessage = {
       chatId: selectedChat as string,
       senderId: currentUser?.uid as string,
-      text: message,
+      text: messageWithQuotes,
       timestamp: new Date(),
       participants:
         currentUser?.chats.find((c) => c.uid === selectedChat)?.participants ||
@@ -79,7 +88,7 @@ const ChatCanvas = () => {
       ...(messages || []),
       {
         chatId: selectedChat as string,
-        text: message,
+        text: messageWithQuotes,
         timestamp: new Date(),
         sender: {
           email: currentUser?.email || '',
@@ -89,6 +98,7 @@ const ChatCanvas = () => {
       },
     ]);
     setMessage('');
+    scrollToBottom();
   };
 
   const scrollToBottom = () => {
@@ -97,6 +107,7 @@ const ChatCanvas = () => {
 
   const loadPreviousMessages = async () => {
     if (!messages) return;
+    setIsFromLoadPreviousButton(true);
     setLoadingPreviousMessages(true);
     let oldMessages = await fetchChatMessages(
       accessToken as string,
@@ -213,8 +224,50 @@ const ChatCanvas = () => {
               timestamp={new Date(message.timestamp)}
               sender={message.sender.email}
               isMessageSentByMe={message.sender.email === currentUser?.email}
+              setReplyingToMessage={setReplyingToMessage}
             />
           ))}
+        </Box>
+
+        <Box
+          sx={{
+            marginTop: '1rem',
+          }}
+        >
+          {replyingToMessage !== '' && (
+            <Box
+              sx={{
+                borderLeft: '4px solid #3f51b5',
+                paddingLeft: '0.5rem',
+                marginLeft: '0.5rem',
+                marginBottom: '0.5rem',
+              }}
+            >
+              <Typography variant="caption" color="initial">
+                Replying to:
+              </Typography>
+              <Typography
+                variant="caption"
+                color="initial"
+                sx={{
+                  marginLeft: '0.5rem',
+                  fontWeight: 'bold',
+                }}
+              >
+                {replyingToMessage}
+              </Typography>
+              <IconButton
+                aria-label="Close"
+                sx={{
+                  marginLeft: '0.5rem',
+                }}
+                size="small"
+                onClick={() => setReplyingToMessage('')}
+              >
+                <CloseIcon />
+              </IconButton>
+            </Box>
+          )}
         </Box>
 
         <Box
@@ -222,7 +275,6 @@ const ChatCanvas = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginTop: '1rem',
           }}
         >
           <TextField
@@ -237,6 +289,9 @@ const ChatCanvas = () => {
               if (ev.key === 'Enter') {
                 sendMessage();
               }
+            }}
+            sx={{
+              backgroundColor: 'white',
             }}
           />
           <IconButton

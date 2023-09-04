@@ -22,7 +22,11 @@ const AppHeader = () => {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar
         position="sticky"
-        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        sx={{
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          boxShadow:
+            '1px 1px 5px 0px -webkit-linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab)',
+        }}
       >
         <Toolbar>
           <IconButton

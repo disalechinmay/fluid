@@ -13,6 +13,8 @@ import {
   ListItemText,
   ListSubheader,
   Toolbar,
+  Tooltip,
+  Typography,
   styled,
 } from '@mui/material';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
@@ -23,10 +25,12 @@ import {
   isAppDrawerVisibleAtom,
   selectedChatAtom,
   userAtom,
+  userPictureAtom,
 } from '../../state';
 import UserIcon from '@mui/icons-material/AccountCircle';
 import AddIcon from '@mui/icons-material/Add';
 import NewChatDialog from '../NewChatDialog/NewChatDialog';
+import { theme } from '../../assets/theme';
 
 export const DRAWER_WIDTH = '300px';
 
@@ -60,12 +64,21 @@ const AppDrawer = () => {
   const [currentUser, setCurrentUser] = useRecoilState(userAtom);
   const [selectedChat, setSelectedChat] = useRecoilState(selectedChatAtom);
   const [newChatDialogOpen, setNewChatDialogOpen] = React.useState(false);
+  const [userPicture, setUserPicture] = useRecoilState(userPictureAtom);
 
   return (
-    <div>
+    <Box>
       <Drawer
         open={isAppDrawerVisible}
         variant="persistent"
+        PaperProps={{
+          sx: {
+            background:
+              'linear-gradient(-45deg, #ee76520f, #e73c7e14, #23a5d516, #23d5ab16)',
+            backgroundSize: ' 400% 400%',
+            animation: 'gradient 15s ease infinite',
+          },
+        }}
         sx={{
           width: DRAWER_WIDTH,
           flexShrink: 0,
@@ -76,13 +89,44 @@ const AppDrawer = () => {
         }}
       >
         <Toolbar />
+
+        <Box
+          sx={{
+            marginTop: '2rem',
+          }}
+        >
+          <Box>
+            <Avatar
+              src={userPicture as string}
+              sx={{ width: 100, height: 100, margin: 'auto' }}
+            />
+          </Box>
+          <Box>
+            <Tooltip title={currentUser?.email}>
+              <Typography
+                variant="h6"
+                sx={{
+                  maxWidth: '100%',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  padding: '1rem',
+                }}
+              >
+                {currentUser?.email}
+              </Typography>
+            </Tooltip>
+          </Box>
+        </Box>
+        <Divider />
+
         <Box sx={{ overflow: 'auto' }}>
           <List
             subheader={
               <ListSubheader
                 sx={{
                   display: 'flex',
-                  marginTop: '2rem',
+                  marginTop: '1rem',
+                  backgroundColor: 'transparent',
                 }}
               >
                 <Box sx={{ flex: 1 }}>Personal Chats</Box>
@@ -126,7 +170,6 @@ const AppDrawer = () => {
               );
             })}
           </List>
-          <Divider />
         </Box>
       </Drawer>
 
@@ -134,7 +177,7 @@ const AppDrawer = () => {
         open={newChatDialogOpen}
         setOpen={(v) => setNewChatDialogOpen(v)}
       />
-    </div>
+    </Box>
   );
 };
 

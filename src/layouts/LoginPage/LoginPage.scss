@@ -1,3 +1,28 @@
+.warning-banner {
+  padding: 1rem 1rem;
+  background-color: #ffcc00; /* Yellow as base color, indicating caution */
+  color: #333333; /* Dark text for readability */
+  text-align: center;
+  z-index: 1000; /* Keeps the banner above other page elements */
+  box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  animation: slideDown 0.5s forwards;
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.5rem;
+}
+
+/* Animation to slide the banner down when added to the DOM */
+@keyframes slideDown {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
 .login-page {
   display: flex;
   justify-content: center;
@@ -45,17 +70,5 @@
     right: 0;
     text-align: center;
     padding: 1rem;
-  }
-
-  @keyframes gradient {
-    0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
-    }
   }
 }
