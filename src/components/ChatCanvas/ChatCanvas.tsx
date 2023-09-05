@@ -26,7 +26,8 @@ import { socket } from '../../utils/sockets';
 import { IBroadcastMessage } from '../../types';
 import { HorizontalRule } from '@mui/icons-material';
 import CloseIcon from '@mui/icons-material/Close';
-
+import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
+import EmojiIcon from '@mui/icons-material/EmojiEmotionsOutlined';
 const EmptyIllustration = require('../../assets/emptyillustration.svg');
 
 const ChatCanvas = () => {
@@ -44,6 +45,7 @@ const ChatCanvas = () => {
   const [isFromLoadPreviousButton, setIsFromLoadPreviousButton] =
     useState(false);
   const [replyingToMessage, setReplyingToMessage] = useState<string>('');
+  const [emojiPickerVisible, setEmojiPickerVisible] = useState(false);
 
   useEffect(() => {
     if (selectedChat) {
@@ -102,7 +104,25 @@ const ChatCanvas = () => {
   };
 
   const scrollToBottom = () => {
-    chatCanvasRef.current?.scrollTo(0, chatCanvasRef.current?.scrollHeight);
+    if (chatCanvasRef.current) {
+      setTimeout(() => {
+        chatCanvasRef.current?.scrollTo(0, chatCanvasRef.current.scrollHeight);
+      }, 100);
+      setTimeout(() => {
+        chatCanvasRef.current?.scrollTo(0, chatCanvasRef.current.scrollHeight);
+      }, 500);
+    }
+  };
+
+  const scrollToTop = () => {
+    if (chatCanvasRef.current) {
+      setTimeout(() => {
+        chatCanvasRef.current?.scrollTo(0, 1);
+      }, 100);
+      setTimeout(() => {
+        chatCanvasRef.current?.scrollTo(0, 1);
+      }, 500);
+    }
   };
 
   const loadPreviousMessages = async () => {
@@ -116,6 +136,12 @@ const ChatCanvas = () => {
     );
     setMessages([...(oldMessages || []), ...messages]);
     setLoadingPreviousMessages(false);
+    scrollToTop();
+  };
+
+  const emojiPicked = (emoji: EmojiClickData) => {
+    setMessage((message) => message + emoji.emoji);
+    setEmojiPickerVisible(false);
   };
 
   if (!selectedChat)
@@ -138,7 +164,7 @@ const ChatCanvas = () => {
               textAlign: 'center',
             }}
           >
-            Select a chat to start messaging
+            Select or create a chat to start messaging
           </Typography>
           <img
             src={EmptyIllustration.default}
@@ -213,6 +239,7 @@ const ChatCanvas = () => {
           sx={{
             flex: 1,
             overflowY: 'scroll',
+            scrollBehavior: 'smooth',
           }}
           ref={chatCanvasRef}
           onChange={scrollToBottom}
@@ -277,6 +304,26 @@ const ChatCanvas = () => {
             justifyContent: 'space-between',
           }}
         >
+          {emojiPickerVisible && (
+            <Box
+              sx={{
+                position: 'absolute',
+                bottom: '11vh',
+              }}
+            >
+              <EmojiPicker
+                height={400}
+                width={300}
+                onEmojiClick={(e) => emojiPicked(e)}
+              />
+            </Box>
+          )}
+          <IconButton
+            onClick={() => setEmojiPickerVisible(!emojiPickerVisible)}
+          >
+            <EmojiIcon />
+          </IconButton>
+
           <TextField
             id="outlined-basic"
             label="Type a message to send"

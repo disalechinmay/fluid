@@ -32,7 +32,7 @@ import AddIcon from '@mui/icons-material/Add';
 import NewChatDialog from '../NewChatDialog/NewChatDialog';
 import { theme } from '../../assets/theme';
 
-export const DRAWER_WIDTH = '300px';
+export const DRAWER_WIDTH = window.innerWidth > 600 ? '300px' : '100vw';
 
 export const MainContent = styled('main', {
   shouldForwardProp: (prop) => prop !== 'open',
@@ -52,6 +52,7 @@ export const MainContent = styled('main', {
       duration: theme.transitions.duration.enteringScreen,
     }),
     marginLeft: DRAWER_WIDTH,
+    display: window.innerWidth > 600 ? `inherit` : 'none',
   }),
   height: '85vh',
 }));
@@ -77,6 +78,7 @@ const AppDrawer = () => {
               'linear-gradient(-45deg, #ee76520f, #e73c7e14, #23a5d516, #23d5ab16)',
             backgroundSize: ' 400% 400%',
             animation: 'gradient 15s ease infinite',
+            boxShadow: '-15px 50px 10px -14px lightgray inset',
           },
         }}
         sx={{
@@ -148,7 +150,10 @@ const AppDrawer = () => {
                 <ListItem
                   key={chatMetadata.uid}
                   disablePadding
-                  onClick={() => setSelectedChat(chatMetadata.uid)}
+                  onClick={() => {
+                    setSelectedChat(chatMetadata.uid);
+                    if (window.innerWidth < 600) setIsAppDrawerVisible(false);
+                  }}
                 >
                   <ListItemButton selected={selectedChat === chatMetadata.uid}>
                     <ListItemIcon sx={{ minWidth: '30px' }}>

@@ -17,7 +17,6 @@ const ChatMessage = (props: ChatMessageProps) => {
 
   useEffect(() => {
     const splitMessage = props.message.split(REPLY_SEPARATOR);
-    console.log(splitMessage);
     if (splitMessage.length > 1) {
       setIsReply(true);
     } else {
@@ -52,7 +51,6 @@ const ChatMessage = (props: ChatMessageProps) => {
             sx={{
               borderLeft: '4px solid #3f51b5',
               paddingLeft: '0.5rem',
-              marginLeft: '0.5rem',
               marginBottom: '0.5rem',
             }}
           >

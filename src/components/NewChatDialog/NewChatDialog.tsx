@@ -89,7 +89,7 @@ const NewChatDialog = ({ open, setOpen }: NewChatDialogProps) => {
             onClick={() => handleCreateChat()}
             disabled={formDisabled}
           >
-            Save
+            Okay
           </Button>
           <Button onClick={() => closeDialog()} color="secondary" size="small">
             Cancel

@@ -10,6 +10,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { useRecoilState } from 'recoil';
 import { isAppDrawerVisibleAtom } from '../../state';
 import { useAuth0 } from '@auth0/auth0-react';
+const GraffitiBackground = require('../../assets/graffiti.svg');
 
 const AppHeader = () => {
   const [isAppDrawerVisible, setIsAppDrawerVisible] = useRecoilState(
@@ -28,7 +29,12 @@ const AppHeader = () => {
             '1px 1px 5px 0px -webkit-linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab)',
         }}
       >
-        <Toolbar>
+        <Toolbar
+          sx={{
+            background: `url(${GraffitiBackground.default})`,
+            color: 'white',
+          }}
+        >
           <IconButton
             size="large"
             edge="start"
