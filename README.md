@@ -9,7 +9,7 @@ Built using:
 ![MUI](https://img.shields.io/badge/Material%20UI-007FFF?style=for-the-badge&logo=mui&logoColor=white)
 ![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white)
 ![Cockroach](https://img.shields.io/badge/Cockroach%20Labs-6933FF?style=for-the-badge&logo=Cockroach%20Labs&logoColor=white)
-<img src="https://upload.wikimedia.org/wikipedia/commons/5/5b/Logo_de_Auth0.svg" height="15" width="80" style="border: 2px solid black; border-radius: 3px; padding: 5px 0px; " />
+<img src="https://upload.wikimedia.org/wikipedia/commons/5/5b/Logo_de_Auth0.svg" height="25" width="80"/>
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
