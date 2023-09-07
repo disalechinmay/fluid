@@ -11,6 +11,8 @@ Built using:
 ![Cockroach](https://img.shields.io/badge/Cockroach%20Labs-6933FF?style=for-the-badge&logo=Cockroach%20Labs&logoColor=white)
 <img src="https://upload.wikimedia.org/wikipedia/commons/5/5b/Logo_de_Auth0.svg" height="25" width="80"/>
 
+https://github.com/disalechinmay/fluid/assets/19512419/13c82513-947e-4698-91bf-7ebfe9a3b4b5
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
