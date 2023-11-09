@@ -1,3 +1,5 @@
+The backend repo is 👉 https://github.com/disalechinmay/fluid-backend
+
 Built using:
 
 ![Typescript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
